@@ -13,9 +13,9 @@ services:
       - ./data/local.conf:/home/nefarious/ircd/local.conf
 #      - ./data/:/home/nefarious/data
     ports:
-      - 6667:6667
-      - 4497:4497
-      - 9998:9998
+      - 127.0.0.1:6667:6667
+      - 127.0.0.1:4497:4497
+      - 127.0.0.1:9998:9998
     env_file:
       - .env
       - .env.local
@@ -38,8 +38,19 @@ services:
       - .env
       - .env.local
     volumes:
-      - x3_data:/x3/data
+      - ./data:/x3/data
 
+  authentik-ldap:
+    image: ghcr.io/goauthentik/ldap
+      #      networks:
+      #  - nginx
+    ports:
+        - 127.0.0.1:389:3389
+        - 127.0.0.1:636:6636
+    env_file:
+      - .env
+      - .env.local
+ 
 volumes:
   x3_data:
 
