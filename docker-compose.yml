@@ -10,7 +10,7 @@ services:
 #      test_net:
 #        ipv6_address: fec0:3200::99
     volumes:
-      - ./data/local.conf:/home/nefarious/ircd/local.conf
+     - ./data/local.conf:/home/nefarious/ircd/local.conf
 #      - ./data/:/home/nefarious/data
     ports:
       - 127.0.0.1:6667:6667
@@ -38,21 +38,44 @@ services:
       - .env
       - .env.local
     volumes:
-      - ./data:/x3/data
+      - ./data/x3.conf:/x3/data/x3.conf
 
-  authentik-ldap:
-    image: ghcr.io/goauthentik/ldap
-      #      networks:
-      #  - nginx
-    ports:
-        - 127.0.0.1:389:3389
-        - 127.0.0.1:636:6636
-    env_file:
-      - .env
-      - .env.local
- 
-volumes:
-  x3_data:
+  integration-tests:
+    container_name: integration-tests
+    build:
+      context: ./tests
+      dockerfile: Dockerfile
+    depends_on:
+      nefarious:
+        condition: service_healthy
+    profiles:
+      - test
+    volumes:
+      - ./tests/src:/tests/src:ro
+
+##  authentik-ldap:
+##    image: ghcr.io/goauthentik/ldap
+##      #      networks:
+##      #  - nginx
+##    ports:
+##        - 127.0.0.1:389:3389
+##        - 127.0.0.1:636:6636
+##    env_file:
+##      - .env
+##      - .env.local
+
+#  keycloak:
+#    container_name: keycloak
+#    image: quay.io/keycloak/keycloak:26.4.7
+#    ports:
+#      - 127.0.0.1:8080:8080
+#    environment:
+#      - KC_BOOTSTRAP_ADMIN_USERNAME=admin
+#      - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
+#    command: start-dev
+
+#volumes:
+#  x3_data:
 
 #networks:
 #  test_net:

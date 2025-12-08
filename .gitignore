@@ -1,6 +1,9 @@
 # Local environment overrides
 .env.local
 
+# IDE
+.vscode/
+
 # Data directories
 data/
 x3_data/
