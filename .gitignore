@@ -9,3 +9,9 @@ x3_data/
 
 # Node modules
 node_modules/
+
+# Claude Code local settings
+.claude/
+
+# Scratch: probe scripts, transcripts and build logs from debugging sessions
+tmp-*

@@ -5,6 +5,9 @@ services:
     build:
         context: ./nefarious
         dockerfile: Dockerfile
+        additional_contexts:
+          libkc: https://github.com/MrLenin/libkc.git
+          libmdbx: https://github.com/erthink/libmdbx.git#v0.13.12
 #    privileged: true
 #    networks:
 #      test_net:
@@ -16,13 +19,20 @@ services:
      - ./data/saslusers:/home/nefarious/ircd/saslusers
 #      - ./data/:/home/nefarious/data
     ports:
-      - 127.0.0.1:6667:6667
-      - 127.0.0.1:6697:6697
+      # Host ports shifted by 10000 for the IRC/WS listeners: the Seance dev
+      # ircd (container `nefarious-dev`) already owns 6667/6697/8067/8443.
+      - 127.0.0.1:16667:6667
+      - 127.0.0.1:16697:6697
+      - 127.0.0.1:18067:8067
+      - 127.0.0.1:18443:8443
       - 127.0.0.1:4497:4497
       - 127.0.0.1:9998:9998
     env_file:
-      - .env
-      - .env.local
+      - path: .env
+        required: true
+      # Optional: personal overrides, never committed.
+      - path: .env.local
+        required: false
     healthcheck:
       test: ["CMD", "pgrep", "-x", "ircd"]
       interval: 5s
@@ -39,10 +49,14 @@ services:
       nefarious:
         condition: service_healthy
     env_file:
-      - .env
-      - .env.local
+      - path: .env
+        required: true
+      # Optional: personal overrides, never committed.
+      - path: .env.local
+        required: false
     volumes:
       - ./data/x3.conf:/x3/data/x3.conf
+      - x3_data:/x3/data
 
   integration-tests:
     container_name: integration-tests
@@ -56,6 +70,7 @@ services:
       - test
     volumes:
       - ./tests/src:/tests/src:ro
+      - /var/run/docker.sock:/var/run/docker.sock
 
 ##  authentik-ldap:
 ##    image: ghcr.io/goauthentik/ldap
@@ -72,7 +87,9 @@ services:
     container_name: keycloak
     image: quay.io/keycloak/keycloak:26.4.7
     ports:
-      - 127.0.0.1:8080:8080
+      # 8080 on the host is taken by another project; keycloak's own port
+      # inside the compose network is unchanged (http://keycloak:8080).
+      - 127.0.0.1:18080:8080
     environment:
       - KC_BOOTSTRAP_ADMIN_USERNAME=admin
       - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
@@ -82,7 +99,7 @@ services:
 
 volumes:
   keycloak_data:
-#  x3_data:
+  x3_data:
 
 #networks:
 #  test_net:
