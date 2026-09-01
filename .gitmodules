@@ -5,4 +5,5 @@
 [submodule "nefarious"]
 	path = nefarious
 	url = git@github.com:evilnet/nefarious2.git
-	branch = master
+	# IRCv3 work (websocket, draft/persistence, SASL_LOCAL) lives here, not master.
+	branch = ircv3.2-upgrade

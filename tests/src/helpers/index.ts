@@ -6,3 +6,9 @@ export {
   type JoinEvent,
   type RawEvent,
 } from './irc-client.js';
+
+export {
+  stopContainer,
+  startContainer,
+  waitForX3Ready,
+} from './docker.js';
